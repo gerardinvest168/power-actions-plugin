@@ -81,7 +81,7 @@ Panel {
   // ---------- Power actions ----------
   function shutdown(noConfirm) {
     if (!noConfirm && !confirmAction("shutdown")) return
-    root.runAction("power-off")
+    root.runAction("shutdown")
   }
 
   function restart(noConfirm) {
@@ -200,20 +200,32 @@ Panel {
     onExited: root.close()
   }
 
+  // `omarchy system` only has lock, logout, reboot, shutdown, stats and wake —
+  // there is no suspend and no power-off verb — and systemctl's verb is
+  // `poweroff`, not `power-off`. Each action therefore builds its own command
+  // instead of being interpolated into one that fails on both halves and swallows
+  // the error through 2>/dev/null.
   function runAction(action) {
     var cmd
-    if (action === "logout") {
+    if (action === "shutdown")
+      cmd = "omarchy system shutdown 2>/dev/null || systemctl poweroff 2>/dev/null"
+    else if (action === "suspend")
+      cmd = "systemctl suspend 2>/dev/null"
+    else if (action === "logout")
       cmd = "omarchy system logout 2>/dev/null || loginctl terminate-session 2>/dev/null"
-    } else {
+    else
       cmd = "omarchy system " + action + " 2>/dev/null || systemctl " + action + " 2>/dev/null"
-    }
     actionProc.command = ["bash", "-c", cmd]
     actionProc.running = true
   }
 
   // ---------- Confirm dialog ----------
   property bool visibleConfirm: false
-  property int confirmType: 0
+  // Holds the action name confirmAction() was called with ("shutdown", "restart",
+  // "sleep", "logoff"). It has to be a string: confirmExecute() switches on those
+  // same names, and an int here silently dropped every assignment, leaving the
+  // dialog's Yes button with nothing to match.
+  property string confirmType: ""
   property real confirmOpacity: 0
   property alias confirmLabel: confirmLabelItem.text
 
@@ -523,10 +535,10 @@ Panel {
 
   function confirmExecute() {
     switch (root.confirmType) {
-      case 1: root.shutdown(true); break
-      case 2: root.restart(true); break
-      case 3: root.sleep(true); break
-      case 4: root.logoff(true); break
+      case "shutdown": root.shutdown(true); break
+      case "restart": root.restart(true); break
+      case "sleep": root.sleep(true); break
+      case "logoff": root.logoff(true); break
     }
   }
 

@@ -2,7 +2,7 @@
 
 ## What it does
 
-A bar widget (󰖲 power icon) that gives you quick access to four power actions — **Shutdown**, **Restart**, **Sleep**, and **Log off** — each with optional countdown timers. Timers survive shell restarts.
+A bar widget that gives you quick access to four power actions — **Shutdown**, **Restart**, **Sleep**, and **Log off** — each with optional countdown timers. Timers survive shell restarts.
 
 ## Install
 
@@ -12,13 +12,13 @@ A bar widget (󰖲 power icon) that gives you quick access to four power actions
 omarchy plugin add https://github.com/gerardinvest168/power-actions-plugin --enable
 ```
 
-Replace the URL with your actual repo once published. Until then, use the manual route.
+The repository is private, so the automated route needs GitHub credentials already cached on the machine.
 
 ### Manual
 
 ```bash
-# 1. Clone or copy the plugin into Omarchy's plugin dir
-cp -r /home/gerygerger/Projects/power-actions ~/.config/omarchy/plugins/gerygerger.power-actions
+# 1. Copy the checkout into Omarchy's plugin dir
+cp -r <path-to-checkout> ~/.config/omarchy/plugins/gerygerger.power-actions
 
 # 2. Make the shell helper scripts executable
 chmod +x ~/.config/omarchy/plugins/gerygerger.power-actions/*.sh
@@ -79,10 +79,10 @@ Timers are stored in `~/.config/omarchy/shell.json` under `powerActions.timerAct
 
 ## How it works
 
-- **Power actions** are executed via `omarchy system <action>` (shutdown→power-off, restart→reboot, sleep→suspend, logoff→logout), falling back to `systemctl <action>` if the omarchy command isn't available.
+- **Power actions** run through `omarchy system shutdown|reboot|logout`, which are the verbs the Omarchy CLI actually has, and fall back to `systemctl poweroff|reboot`. Sleep has no `omarchy system` verb, so it goes straight to `systemctl suspend`, and logoff falls back to `loginctl terminate-session`.
 - **Timers** use a 1-second `Timer` element in QML counting down `timerSeconds`. When it hits zero the scheduled action fires immediately (no confirmation for timed actions).
 - **State persistence** is handled by three shell scripts — `read-timer.sh`, `write-timer.sh`, `remove-timer.sh` — that read/write the `powerActions` key in `shell.json`.
-- **IPC** exposes `shutdown()`, `restart()`, `sleep()`, `logoff()`, `cancelTimer()` to other plugins and CLIs via `omarchy-shell shell invoke gerygerger.power-actions <method>`.
+- **IPC** exposes `shutdown()`, `restart()`, `sleep()`, `logoff()`, `cancelTimer()` and `readTimerState()` on the `gerygerger.power-actions` target, called as `omarchy-shell gerygerger.power-actions cancelTimer`.
 
 ## Troubleshooting
 
@@ -99,7 +99,7 @@ Timers are stored in `~/.config/omarchy/shell.json` under `powerActions.timerAct
 
 **Power action fails**
 1. `omarchy system shutdown --help` — confirm the omarchy command exists.
-2. Fallback uses `systemctl power-off / reboot / suspend / logout` — confirm those work from a terminal.
+2. Fallbacks are `systemctl poweroff`, `systemctl reboot`, `systemctl suspend` and `loginctl terminate-session` — confirm those work from a terminal.
 3. Logout requires a session manager; on Hyprland this goes through `loginctl terminate-session`.
 
 ## Files
@@ -108,7 +108,6 @@ Timers are stored in `~/.config/omarchy/shell.json` under `powerActions.timerAct
 ~/.config/omarchy/plugins/gerygerger.power-actions/
 ├── manifest.json          # Plugin manifest
 ├── Panel.qml              # Main UI (bar button + popup panel)
-├── Model.js               # Shared JS utilities
 ├── read-timer.sh          # Reads timer state from shell.json
 ├── write-timer.sh         # Writes timer state to shell.json
 └── remove-timer.sh        # Clears timer state from shell.json
