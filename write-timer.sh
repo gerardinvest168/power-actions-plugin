@@ -1,28 +1,33 @@
 #!/bin/bash
-# write-timer.sh — Persist timer state to shell.json
-# Args: action (1-4) seconds
+# write-timer.sh — Persist an armed timer as "<action>:<deadline>".
+#
+# Usage: write-timer.sh <action 1-4> <deadline epoch seconds>
+#
+# Stores an absolute deadline rather than a countdown, so a shell restart reads
+# back the real time left instead of restarting the original duration.
+#
+# Writes only this plugin's own state file (atomic temp + rename). The previous
+# version rewrote ~/.config/omarchy/shell.json and fell back to writing "{}" when
+# that file failed to parse, which destroyed the whole bar layout.
 
-ACTION="${1:-0}"
-SECONDS="${2:-0}"
+set -eu
 
-SHELL_JSON="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/shell.json"
+action="${1:-0}"
+deadline="${2:-0}"
 
-python3 -c "
-import sys, json, os
-path = '$SHELL_JSON'
-data = {}
-if os.path.exists(path):
-    try:
-        with open(path) as f:
-            data = json.load(f)
-    except Exception:
-        pass
+if [[ ! "$action" =~ ^[1-4]$ ]]; then
+  echo "write-timer.sh: action must be 1-4, got '$action'" >&2
+  exit 2
+fi
 
-data.setdefault('powerActions', {})
-data['powerActions']['timerAction'] = int('$ACTION') if '$ACTION' and '$ACTION' != '0' else 0
-data['powerActions']['timerSeconds'] = int('$SECONDS') if '$SECONDS' and '$SECONDS' != '0' else 0
+if [[ ! "$deadline" =~ ^[0-9]+$ ]]; then
+  echo "write-timer.sh: deadline must be epoch seconds, got '$deadline'" >&2
+  exit 2
+fi
 
-os.makedirs(os.path.dirname(path), exist_ok=True)
-with open(path, 'w') as f:
-    json.dump(data, f, indent=2)
-" 2>/dev/null
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/gerygerger.power-actions"
+mkdir -p "$state_dir"
+
+tmp="$(mktemp "$state_dir/.timer.XXXXXX")"
+printf '%s:%s\n' "$action" "$deadline" > "$tmp"
+mv -f "$tmp" "$state_dir/timer"

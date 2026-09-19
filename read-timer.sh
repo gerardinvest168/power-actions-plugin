@@ -1,23 +1,23 @@
 #!/bin/bash
-# read-timer.sh — Read persistent timer state from shell.json
-# Output format: "action:seconds" or "0:0" if no timer
+# read-timer.sh — Print the persisted timer as "<action>:<deadline>".
+#
+#   action   1=shutdown 2=restart 3=sleep 4=logoff, 0 = nothing armed
+#   deadline epoch seconds at which the action fires
+#
+# Prints "0:0" when no timer is armed. Reads only this plugin's own state file,
+# so it can never damage shell.json.
 
-SHELL_JSON="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/shell.json"
+set -u
 
-if [[ ! -f "$SHELL_JSON" ]]; then
-  echo "0:0"
-  exit 0
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/gerygerger.power-actions"
+STATE_FILE="$STATE_DIR/timer"
+
+if [[ -r "$STATE_FILE" ]]; then
+  IFS=: read -r action deadline < "$STATE_FILE" || true
+  if [[ "${action:-0}" =~ ^[1-4]$ && "${deadline:-0}" =~ ^[0-9]+$ ]]; then
+    printf '%s:%s\n' "$action" "$deadline"
+    exit 0
+  fi
 fi
 
-# Extract timer action and seconds using python (lightweight JSON parse)
-python3 -c "
-import sys, json
-try:
-    with open('$SHELL_JSON') as f:
-        d = json.load(f)
-    ta = d.get('powerActions', {}).get('timerAction', 0)
-    ts = d.get('powerActions', {}).get('timerSeconds', 0)
-    print(f'{ta}:{ts}')
-except Exception:
-    print('0:0')
-" 2>/dev/null
+printf '0:0\n'

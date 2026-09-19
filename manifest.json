@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "id": "gerygerger.power-actions",
   "name": "Power Actions",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Gerygerger",
-  "description": "Shutdown, restart, sleep, logoff with timer support",
+  "description": "Shutdown, restart, sleep, logoff with countdown timers",
   "kinds": [
     "bar-widget"
   ],
