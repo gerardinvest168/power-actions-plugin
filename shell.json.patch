@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "idle": {
+    "screensaver": 150,
+    "lock": 300
+  },
+  "bar": {
+    "position": "top",
+    "transparent": true,
+    "centerAnchor": "omarchy.clock",
+    "layout": {
+      "left": [
+        { "id": "io.github.omamenu" },
+        { "id": "pacman-workspaces" },
+        { "id": "oliwier.agent-skills-manager" },
+        { "id": "brenoperucchi.omasession" },
+        { "id": "io.github.pablousx.omastart" },
+        { "id": "davedes.workspace-restorer" },
+        { "id": "io.github.theothermike.ansi-screensaver" }
+      ],
+      "center": [
+        { "id": "omarchy.indicators" },
+        { "id": "omarchy.clock", "format": "dddd HH:mm", "formatAlt": "d MMMM 'W'ww yyyy", "verticalFormat": "HH\n—\nmm" },
+        { "id": "omarchy.keyboard-layout" },
+        { "id": "omarchy.weather" },
+        { "id": "khizarimran.fxdesk" },
+        { "id": "io.github.nimbleaininja.omachron", "cities": [
+          { "label": "New York", "tz": "America/New_York", "lat": 40.7128, "lon": -74.006 },
+          { "label": "London", "tz": "Europe/London", "lat": 51.5074, "lon": -0.1278 },
+          { "label": "Berlin", "tz": "Europe/Berlin", "lat": 52.52, "lon": 13.405 },
+          { "label": "Tokyo", "tz": "Asia/Tokyo", "lat": 35.6762, "lon": 139.6503 },
+          { "label": "Sydney", "tz": "Australia/Sydney", "lat": -33.8688, "lon": 151.2093 }
+        ]},
+        { "id": "omarchy.system-update" }
+      ],
+      "right": [
+        { "id": "omarchy.tray" },
+        { "id": "jesseburlamaque.omarchy-find" },
+        { "id": "omarchy.agents" },
+        { "id": "omarchy.bluetooth" },
+        { "id": "omarchy.network" },
+        { "id": "omarchy.audio" },
+        { "id": "gerygerger.monitor" },
+        { "id": "gerygerger.power", "showPercentage": true, "autoDimEnabled": true, "autoDimThreshold": 300, "autoDimTarget": 50 },
+        { "id": "gerygerger.power-actions" }
+      ]
+    }
+  },
+  "plugins": [
+    { "id": "io.github.jcputney.media-float-youtube" },
+    { "id": "zen.lock" },
+    { "id": "io.github.equa-tory.quicksearch" },
+    { "id": "io.github.linar46.aether-opacity" },
+    { "id": "nguyenn.clipboard" },
+    { "id": "birdseye.window-overview" },
+    { "id": "io.github.andyweiboan.missioncontrol" }
+  ],
+  "disabledPlugins": [
+    "omarchy.menu",
+    "omarchy.lock",
+    "omarchy.clipboard"
+  ],
+  "cloneSourceRestores": [
+    "io.github.omamenu",
+    "zen.lock",
+    "nguyenn.clipboard"
+  ]
+}

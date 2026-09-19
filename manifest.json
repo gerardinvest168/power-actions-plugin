@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "gerygerger.power-actions",
+  "name": "Power Actions",
+  "version": "1.0.0",
+  "author": "Gerygerger",
+  "description": "Shutdown, restart, sleep, logoff with timer support",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Power Actions",
+    "description": "Shutdown, restart, sleep, and logoff with countdown timers",
+    "category": "System",
+    "allowMultiple": false
+  },
+  "omarchy": {
+    "clonedFrom": "omarchy.power"
+  }
+}
